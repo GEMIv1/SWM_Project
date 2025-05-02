@@ -1,2 +1,2 @@
 # SWM_Project
-Learning management
+Learning management system
