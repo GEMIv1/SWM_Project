@@ -2,7 +2,7 @@
 
 ## Functional Requirements
 
-# Overview
+## Overview
 - The system conatins three types of users (admin, students, instructors) each can do different functionality also it conains courses each course has students enrolled in it and has quzies, lessons
 - The system allow the users to login, register, view profile
 
