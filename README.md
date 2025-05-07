@@ -1,10 +1,10 @@
-﻿### Learning manegment system
+﻿### Learning Management System
 
 ## Functional Requirements
 
 ## Overview
-- The system conatins three types of users (admin, students, instructors) each can do different functionality also it conains courses each course has students enrolled in it and has quzies, lessons
-- The system allow the users to login, register, view profile
+- The system contains three types of users (admin, students, instructors) each can do different functionality also it contains courses each course has students enrolled in it and has quizzes, lessons
+- The system allows the users to login, register, view profile
 
 ## 1. User Management
 
