@@ -45,12 +45,8 @@ public class AssignmentService {
         }
         return null;
     }
+   @Transactional
     public void DeleteAssignment(long id){
-        Assignment assignment = assignmentRepo.findById(id).orElse(null);
-        if (assignment != null)
-        {
-            assignmentRepo.delete(assignment);
-        }
-        throw new RuntimeException("Assignment is not Found!");
+        Assignment assignment = assignmentRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Assignment not found with id: " + id));assignmentRepo.delete(assignment);
     }
 }
