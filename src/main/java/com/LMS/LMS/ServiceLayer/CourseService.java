@@ -113,49 +113,45 @@ public class CourseService {
         }
     }
 
+    @Transactional
     public void enrollStudent(Long courseId, Long studentId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
 
         User student = userRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
 
-        // Verify student role
         if (student.getRole() != Role.Student) {
-            throw new RuntimeException("Selected user is not a student");
+            throw new PermissionDeniedException("Selected user is not a student");
         }
 
-        // Check if student is already enrolled
         if (course.getStudents().contains(student)) {
-            throw new RuntimeException("Student is already enrolled in this course");
+            throw new DuplicateEnrollmentException("Student is already enrolled in course id: " + courseId);
         }
 
         course.getStudents().add(student);
         courseRepository.save(course);
 
-        // Send email notification for enrollment confirmation
         emailNotificationService.sendEnrollmentConfirmation(student.getEmail(), course.getTitle());
 
-        // Create notifications for the student
         Notification studentNotification = new Notification();
         studentNotification.setRecipientId(student.getID());
-        studentNotification.setSenderId(course.getInstructor().getID());  // Instructor as the sender
-        studentNotification.setMessage("You have successfully enrolled in the course: " + course.getTitle());
+        studentNotification.setSenderId(course.getInstructor().getID());
+        studentNotification.setMessage("Enrolled in: " + course.getTitle());
         studentNotification.setType("ENROLLMENT_CONFIRMATION");
         notificationRepository.save(studentNotification);
 
-        // Create notifications for the instructor
         Notification instructorNotification = new Notification();
         instructorNotification.setRecipientId(course.getInstructor().getID());
-        instructorNotification.setSenderId(student.getID());  // Student as the sender
-        instructorNotification.setMessage("A student has enrolled in your course: " + course.getTitle());
+        instructorNotification.setSenderId(student.getID());
+        instructorNotification.setMessage("New enrollment in: " + course.getTitle());
         instructorNotification.setType("STUDENT_ENROLLMENT");
         notificationRepository.save(instructorNotification);
     }
 
     public List<User> getEnrolledStudents(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseId));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
 
         return course.getStudents();
     }
