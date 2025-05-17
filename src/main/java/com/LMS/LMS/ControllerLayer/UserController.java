@@ -41,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok(userService.ViewProfile(id));
 
     }
-    @PostMapping("UpdateProfile/{UserId}")
+    @PutMapping("UpdateProfile/{UserId}")
     public ResponseEntity<User>UpdateProfile(@PathVariable Long UserId, @RequestBody UserRegistration userRegistration){
        return ResponseEntity.ok(userService.UpdateProfile(UserId ,userRegistration));
     }
