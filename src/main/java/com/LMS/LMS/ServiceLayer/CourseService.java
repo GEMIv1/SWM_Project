@@ -29,17 +29,17 @@ public class CourseService {
         this.assignmentRepo = assignmentRepo;
     }
 
+    @Transactional
     public Course createCourse(CourseDTO courseDTO, User currentUser) {
         if (currentUser.getRole() == Role.Student) {
-            throw new RuntimeException("Students do not have permission to create courses");
+            throw new PermissionDeniedException("Students do not have permission to create courses");
         }
 
         User instructor = userRepository.findById(courseDTO.getInstructor().getID())
-                .orElseThrow(() -> new RuntimeException("Instructor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + courseDTO.getInstructor().getID()));
 
-        // Verify instructor role
         if (instructor.getRole() != Role.Instructor) {
-            throw new RuntimeException("Selected user is not an instructor");
+            throw new PermissionDeniedException("Selected user is not an instructor");
         }
 
         Course course = new Course();
@@ -49,6 +49,15 @@ public class CourseService {
         course.setInstructor(instructor);
 
         return courseRepository.save(course);
+    }
+
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
     }
 
     public List<Course> getAllCourses() {
