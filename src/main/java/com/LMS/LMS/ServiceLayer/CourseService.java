@@ -60,19 +60,18 @@ public class CourseService {
                 .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
     }
 
+   @Transactional
     public Course updateCourse(Long id, CourseDTO courseDTO, User currentUser) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
 
-        // Check if user is a student
         if (currentUser.getRole() == Role.Student) {
-            throw new RuntimeException("Students do not have permission to update courses");
+            throw new PermissionDeniedException("Students do not have permission to update courses");
         }
 
-        // Check if user is the course instructor or an admin
         if (currentUser.getRole() != Role.Admin &&
                 !course.getInstructor().getID().equals(currentUser.getID())) {
-            throw new RuntimeException("You do not have permission to update this course");
+            throw new PermissionDeniedException("You do not have permission to update this course");
         }
 
         course.setTitle(courseDTO.getTitle());
@@ -151,4 +150,6 @@ public class CourseService {
 
         return course.getStudents();
     }
+
+    
 }
