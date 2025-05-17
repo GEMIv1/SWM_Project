@@ -41,8 +41,7 @@ public class AssignmentGrades {
         this.feedback = feedback;
         this.submissionDate = submissionDate;
         this.submissionContent = submissionContent;
-        this.isLate = submissionDate != null && assignment != null &&
-                submissionDate.isAfter(assignment.getDueDate());
+        updateIsLate();
     }
 
     // Getters and Setters
@@ -75,7 +74,8 @@ public class AssignmentGrades {
     public Boolean getIsLate() { return isLate; }
 
     private void updateIsLate() {
-        this.isLate = submissionDate != null && assignment != null &&
+        this.isLate = submissionDate != null && assignment != null && 
+                assignment.getDueDate() != null &&
                 submissionDate.isAfter(assignment.getDueDate());
     }
     public String getFileName() { return fileName; }

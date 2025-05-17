@@ -20,7 +20,7 @@
         private final CourseService courseService;
 
         @Autowired
-        public CourseController(@Lazy CourseService courseService) {
+        public CourseController(CourseService courseService) {
             this.courseService = courseService;
         }
 
