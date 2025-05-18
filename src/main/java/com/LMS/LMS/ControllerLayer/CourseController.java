@@ -41,10 +41,18 @@
             return ResponseEntity.ok(courseService.getCourseById(id));
         }
 
-        @PutMapping("/updateCourse/{id}")
+      @PutMapping("/updateCourse/{id}")
         public ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody UpdateCourseRequest request) {
-            courseService.updateCourse(id, request.getCourseDTO(), request.getCurrentUser());
-            return ResponseEntity.ok("Course updated successfully.");
+            try {
+                courseService.updateCourse(id, request.getCourseDTO(), request.getCurrentUser());
+                return ResponseEntity.ok("Course updated successfully.");
+            } catch (ResourceNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } catch (PermissionDeniedException e) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update course: " + e.getMessage());
+            }
         }
 
         @DeleteMapping("/deleteCourse/{id}")
@@ -55,12 +63,26 @@
 
         @PostMapping("/{courseId}/enroll/{studentId}")
         public ResponseEntity<String> enrollStudent(@PathVariable Long courseId, @PathVariable Long studentId) {
-            courseService.enrollStudent(courseId, studentId);
-            return ResponseEntity.ok("Student enrolled successfully.");
+            try {
+                courseService.enrollStudent(courseId, studentId);
+                return ResponseEntity.ok("Student enrolled successfully.");
+            } catch (ResourceNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } catch (PermissionDeniedException e) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            } catch (DuplicateEnrollmentException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            } catch (EmailNotificationException e) {
+
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("Student enrolled successfully but failed to send email notification: " + e.getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to enroll student: " + e.getMessage());
+            }
         }
 
         @GetMapping("/{courseId}/students")
-        public ResponseEntity<List<User>> getEnrolledStudents(@PathVariable Long courseId) {
+         public ResponseEntity<List<User>> getEnrolledStudents(@PathVariable Long courseId) {
             return ResponseEntity.ok(courseService.getEnrolledStudents(courseId));
         }
     }
