@@ -15,10 +15,22 @@ public class AdminCourseController {
     public AdminCourseController(AdminCourseService adminCourseService) {
         this.adminCourseService = adminCourseService;
     }
-    @PostMapping("CreateCourse")
-    public ResponseEntity<String>CreateCourse(@RequestBody CourseDTO courseDTO , User curren){
-        adminCourseService.createCourse(courseDTO , curren) ;
-        return ResponseEntity.status(HttpStatus.CREATED).body("Course created successfully.");
+ @PostMapping("CreateCourse")
+    public ResponseEntity<String> createCourse(@RequestBody CourseDTO courseDTO, User currentUser) {
+        try {
+            adminCourseService.createCourse(courseDTO, currentUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Course created successfully.");
+        } catch (PermissionDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (InvalidRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (EmailNotificationException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send notification: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+        }
     }
     @DeleteMapping("DeleteCourse/{CourseId}")
     public ResponseEntity<String>DeleteCourse(@PathVariable Long CourseId , @RequestAttribute User currentUser){
