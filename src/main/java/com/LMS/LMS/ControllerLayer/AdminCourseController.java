@@ -32,10 +32,20 @@ public class AdminCourseController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
-    @DeleteMapping("DeleteCourse/{CourseId}")
-    public ResponseEntity<String>DeleteCourse(@PathVariable Long CourseId , @RequestAttribute User currentUser){
-        adminCourseService.deleteCourse(CourseId , currentUser);
-        return ResponseEntity.ok("Course Deleted successfully");
+ @DeleteMapping("DeleteCourse/{CourseId}")
+    public ResponseEntity<String> deleteCourse(@PathVariable Long CourseId,  User currentUser) {
+        try {
+            adminCourseService.deleteCourse(CourseId, currentUser);
+            return ResponseEntity.ok("Course deleted successfully");
+        } catch (CourseNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (PermissionDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+        }
     }
 
 }
