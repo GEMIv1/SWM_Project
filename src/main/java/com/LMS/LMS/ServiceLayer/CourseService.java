@@ -90,29 +90,26 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    @Transactional
     public void deleteCourse(Long id, User currentUser) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
 
-        // Check if user is a student
         if (currentUser.getRole() == Role.Student) {
-            throw new RuntimeException("Students do not have permission to delete courses");
+            throw new PermissionDeniedException("Students do not have permission to delete courses");
         }
 
-        // Check if user is the course instructor or an admin
         if (currentUser.getRole() != Role.Admin &&
                 !course.getInstructor().getID().equals(currentUser.getID())) {
-            throw new RuntimeException("You do not have permission to delete this course");
+            throw new PermissionDeniedException("You do not have permission to delete this course");
         }
+
         if (course.getAssignments() != null) {
-            for (Assignment assignment : course.getAssignments()) {
-                assignmentRepo.delete(assignment);
-            }
-
-            courseRepository.deleteById(id);
+            course.getAssignments().forEach(assignmentRepo::delete);
         }
-    }
 
+        courseRepository.deleteById(id);
+    }
     @Transactional
     public void enrollStudent(Long courseId, Long studentId) {
         Course course = courseRepository.findById(courseId)

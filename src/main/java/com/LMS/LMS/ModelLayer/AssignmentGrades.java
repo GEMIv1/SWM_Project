@@ -52,7 +52,7 @@ public class AssignmentGrades {
     public void setStudent(User student) { this.student = student; }
 
     public Assignment getAssignment() { return assignment; }
-    public void setAssignment(Assignment assignment) { this.assignment = assignment; }
+    public void setAssignment(Assignment assignment) { this.assignment = assignment; updateIsLate(); }
 
     public String getGrade() { return grade; }
     public void setGrade(String grade) { this.grade = grade; }
@@ -61,10 +61,7 @@ public class AssignmentGrades {
     public void setFeedback(String feedback) { this.feedback = feedback; }
 
     public LocalDateTime getSubmissionDate() { return submissionDate; }
-    public void setSubmissionDate(LocalDateTime submissionDate) {
-        this.submissionDate = submissionDate;
-        updateIsLate();
-    }
+ 
 
     public String getSubmissionContent() { return submissionContent; }
     public void setSubmissionContent(String submissionContent) {
